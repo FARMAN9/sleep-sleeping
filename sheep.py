@@ -123,6 +123,35 @@ def get_sheep_state_fast(animal_crop):
 
 # ---------------- Thread Classes ---------------- #
 
+
+
+import cv2
+
+class ImageCapture:
+    """Load a single image instead of video"""
+    def __init__(self, image_path):
+        self.image_path = image_path
+        self.image = None
+        self.width = 0
+        self.height = 0
+
+    def start(self):
+        self.image = cv2.imread(self.image_path)
+        if self.image is None:
+            print("Error: Could not load image.")
+            return False
+
+        self.height, self.width = self.image.shape[:2]
+        return True
+
+    def get_frame(self):
+        """Return the single image once"""
+        return self.image
+
+    def stop(self):
+        self.image = None
+
+
 class VideoCaptureThread:
     """Thread for capturing video frames"""
     def __init__(self, video_source, frame_queue, max_queue_size=MAX_QUEUE_SIZE):
@@ -177,7 +206,7 @@ class VideoCaptureThread:
 
 class ProcessingThread:
     """Thread for processing frames with YOLO"""
-    def __init__(self, frame_queue, processed_queue, model_path="yolov8n.pt"):
+    def __init__(self, frame_queue, processed_queue, model_path="yolo11n-pose.pt"): # model_path="yolo11n-pose.pt" or "yolo11n.pt"
         self.frame_queue = frame_queue
         self.processed_queue = processed_queue
         self.model_path = model_path
